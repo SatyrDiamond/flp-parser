@@ -21,6 +21,14 @@ for line in lines:
 	else:
 		eventtable.append([idname[0], '_unknown'])
 
+def datablock(PatternNotes, bytesnumber):
+	notelistdata = BytesIO()
+	notelistdata.write(PatternNotes)
+	notelistdata_filesize = notelistdata.tell()
+	notelistdata.seek(0)
+	while notelistdata.tell() < notelistdata_filesize:
+		print('\t\t' + bytes(notelistdata.read(bytesnumber)).hex())
+
 def parse_patternnotes(patternnotesbytes):
     notelistdata = BytesIO()
     notelistdata.write(patternnotesbytes)
@@ -99,24 +107,23 @@ for riffobj in rifftable:
 	if riffobj[0] == b'FLdt':
 		flpevents = parse_flp_Events(riffobj[1])
 
-
-
 for flpevent in flpevents:
 	event_id = flpevent[0]
+	event_data = flpevent[1]
 	if event_id == 238:
-		print(lines[flpevent[0]].strip())
+		print(lines[event_id].strip())
 		parse_FLTrack(flpevent[1])
 	elif event_id == 224:
-		print(lines[flpevent[0]].strip())
+		print(lines[event_id].strip())
 		parse_patternnotes(flpevent[1])
-	elif event_id == 238:
-		print(lines[flpevent[0]].strip())
-		parse_FLTrack(flpevent[1])
-	elif event_id == 241:
-		print(lines[flpevent[0]].strip())
-		print('\t'+flpevent[1].decode('utf-16le').rstrip('\0'))
+	elif event_id == 233: #PlayListItems
+		print(lines[event_id].strip())
+		datablock(event_data, 32)
+	elif event_id == 241: #strings, utf16
+		print(lines[event_id].strip())
+		print('\t'+event_data.decode('utf-16le').rstrip('\0'))
 	elif event_id <= 255 and event_id >= 192 : # text
-		print(lines[flpevent[0]].strip())
-		print('\t'+str(flpevent[1].hex()))
+		print(lines[event_id].strip())
+		print('\t'+str(event_data.hex()))
 	else:
-		print(lines[flpevent[0]].strip()+";"+str(flpevent[1]))
+		print(lines[event_id].strip()+";"+str(flpevent[1]))
