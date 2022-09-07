@@ -106,7 +106,7 @@ for flpevent in flpevents:
 	if event_id == 238:
 		print(lines[flpevent[0]].strip())
 		parse_FLTrack(flpevent[1])
-	if event_id == 224:
+	elif event_id == 224:
 		print(lines[flpevent[0]].strip())
 		parse_patternnotes(flpevent[1])
 	elif event_id <= 255 and event_id >= 192 : # text
