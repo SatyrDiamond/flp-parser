@@ -1,5 +1,4 @@
 import argparse
-import func_riff
 import varint
 
 from io import BytesIO
