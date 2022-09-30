@@ -20,6 +20,22 @@ for line in lines:
 	else:
 		eventtable.append([idname[0], '_unknown'])
 
+
+def readriffdata(riffbytebuffer, offset):
+	if isinstance(riffbytebuffer, (bytes, bytearray)) == True:
+		riffbytebuffer = bytearray2BytesIO(riffbytebuffer)
+	riffobjects = []
+	riffbytebuffer.seek(0,2)
+	filesize = riffbytebuffer.tell()
+	riffbytebuffer.seek(offset)
+	while filesize > riffbytebuffer.tell():
+		chunkname = riffbytebuffer.read(4)
+		chunksize = int.from_bytes(riffbytebuffer.read(4), "little")
+		chunkdata = riffbytebuffer.read(chunksize)
+		riffobjects.append([chunkname, chunkdata])
+	return riffobjects
+
+
 def datablock(PatternNotes, bytesnumber):
 	notelistdata = BytesIO()
 	notelistdata.write(PatternNotes)
@@ -97,7 +113,7 @@ def parse_flp_Events(riffobj):
 
 fileobject = open(args.input, 'rb')
 headername = fileobject.read(4)
-rifftable = func_riff.readriffdata(fileobject, 0)
+rifftable = readriffdata(fileobject, 0)
 for riffobj in rifftable:
 	#print(str(riffobj[0]) + str(len(riffobj[1])))
 	if riffobj[0] == b'FLhd':
