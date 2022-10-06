@@ -15,8 +15,8 @@
 14 Pitchable
 15 Zipped
 16 Delay_Flags
-17 PatLength
-18 BlockLength
+17 Numerator
+18 Denominator
 19 UseLoopPoints
 20 LoopType
 21 ChanType
@@ -96,7 +96,7 @@
 95 FXIcon
 96 
 97 
-98 
+98 FXToSlotNum
 99 
 100 
 101 
@@ -239,7 +239,7 @@
 238 PLTrackInfo
 239 PLTrackName
 240 
-241 
+241 ArrangementName
 242 
 243 
 244 
