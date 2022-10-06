@@ -31,8 +31,8 @@
 30 TruncateClipNotes
 31 EEAutoMode
 32 
-33 
-34 
+33 TimeMarkerNumerator
+34 TimeMarkerDenominator
 35 
 36 
 37 
@@ -97,7 +97,7 @@
 96 
 97 
 98 FXToSlotNum
-99 
+99 NewArrangement
 100 
 101 
 102 
