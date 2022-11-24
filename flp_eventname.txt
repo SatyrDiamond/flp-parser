@@ -98,7 +98,7 @@
 97 
 98 FXToSlotNum
 99 NewArrangement
-100 
+100 CurrentArrangementNum
 101 
 102 
 103 
@@ -203,7 +203,7 @@
 202 ProjectDataPath
 203 PluginName
 204 FXName
-205 TimeMarker
+205 TimeMarkerName
 206 Genre
 207 Author
 208 MIDICtrls
