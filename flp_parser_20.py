@@ -85,6 +85,7 @@ def parse_FLTrack(trackdata):
     print('\tPositionSync:',int.from_bytes(fltrackdata.read(4), "little"))
     print('\tGrouped:',int.from_bytes(fltrackdata.read(1), "little"))
     print('\tLocked:',int.from_bytes(fltrackdata.read(1), "little"))
+    print('\tRest:',fltrackdata.read())
 
 def parse_arr(arrdata):
     flarrdata = BytesIO()
@@ -158,6 +159,53 @@ def parse_flp_Events(riffobj):
             outputtable.append([event_id,eventpart])
     return outputtable
 
+def linearbyte2percent(inputbyteio):
+    intvalue = int.from_bytes(inputbyteio.read(4), "little")
+    smalltime = ((intvalue-100)/65436)*6
+    outputval = smalltime * smalltime
+    return intvalue
+
+def parse_envelope(envelopebytes):
+    envelopedata = BytesIO()
+    envelopedata.write(envelopebytes)
+    envelopedata.seek(0)
+    print('\tFlags:',envelopedata.read(4))
+    print('\tEnabled:',envelopedata.read(4))
+    print('\tASDR PreDelay:',linearbyte2percent(envelopedata))
+    print('\tASDR Attack:',linearbyte2percent(envelopedata))
+    print('\tASDR Hold:',linearbyte2percent(envelopedata))
+    print('\tASDR Decay:',linearbyte2percent(envelopedata))
+    print('\tASDR Suspend:',int.from_bytes(envelopedata.read(4), "little")/128)
+    print('\tASDR Release:',linearbyte2percent(envelopedata))
+    print('\tASDR Amount:',int.from_bytes(envelopedata.read(4), "little"))
+    print('\tLFO Delay:',int.from_bytes(envelopedata.read(4), "little"))
+    print('\tLFO Attack:',int.from_bytes(envelopedata.read(4), "little"))
+    print('\tLFO Amount:',int.from_bytes(envelopedata.read(4), "little"))
+    print('\tLFO Speed:',int.from_bytes(envelopedata.read(4), "little"))
+    print('\tLFO Shape:',int.from_bytes(envelopedata.read(4), "little"))
+    print('\tASDR AttackTension:',int.from_bytes(envelopedata.read(4), "little"))
+    print('\tASDR DecayTension:',int.from_bytes(envelopedata.read(4), "little"))
+    print('\tASDR ReleaseTension:',int.from_bytes(envelopedata.read(4), "little"))
+
+def parse_InitCtrlRecChan(inbytes):
+    notelistdata = BytesIO()
+    notelistdata.write(inbytes)
+    notelistdata_filesize = notelistdata.tell()
+    notelistdata.seek(0)
+    while notelistdata.tell() < notelistdata_filesize:
+        icrc_dummy = notelistdata.read(4)
+        icrc_control = notelistdata.read(2)[::-1]
+        icrc_group = notelistdata.read(2)[::-1]
+        icrc_value = notelistdata.read(4)
+        print('\t\t', 
+            bytes(icrc_group).hex(), 
+            bytes(icrc_control).hex(), 
+            bytes(icrc_value).hex(),
+            str(int.from_bytes(icrc_value, "little", signed=True)).ljust(10),
+            str(struct.unpack('<f', icrc_value)[0]),
+            )
+
+
 fileobject = open(args.input, 'rb')
 headername = fileobject.read(4)
 rifftable = readriffdata(fileobject, 0)
@@ -184,9 +232,18 @@ for flpevent in flpevents:
     elif event_id == 233:
         print(lines[event_id].strip())
         parse_arr(flpevent[1])
-    elif event_id == 233:
+    elif event_id == 218:
         print(lines[event_id].strip())
-        parse_arr(flpevent[1])
+        parse_envelope(flpevent[1])
+
+    elif event_id == 216:
+        print(lines[event_id].strip())
+        parse_InitCtrlRecChan(flpevent[1])
+
+    elif event_id == 225:
+        print(lines[event_id].strip())
+        parse_InitCtrlRecChan(flpevent[1])
+
     elif event_id == 235:
         print(lines[event_id].strip())
         parse_fxrouting(flpevent[1])
